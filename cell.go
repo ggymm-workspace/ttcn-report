@@ -25,7 +25,7 @@ func setCell(tpl *excelize.File, params map[string]string) error {
 					continue
 				}
 				// 处理图片
-				if strings.HasSuffix(label, "（图片）") {
+				if strings.HasSuffix(label, "图片") {
 					if len(value) == 0 || !exists(value) {
 						// 如果图片地址为空
 						// 如果图片文件不存在，则不执行后续的逻辑

@@ -2,35 +2,65 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/xuri/excelize/v2"
 )
 
 var (
-	// file = "docs/case报告/示例日志/ATS_Test_2026-01-15_09-47-26-MTC.log"
-	file = "docs/case报告/示例日志/ATS_Test_2026-01-15_09-50-12-MTC.log"
-	// file = "docs/case报告/示例日志/ATS_Test_2026-01-15_09-58-31-MTC.log"
-)
-
-var (
-	sheet = "Sheet1"
+	logs   = map[string][]string{}
+	sheet  = "Sheet1"
+	output = "output/Report.xlsx"
 )
 
 func init() {
-	err := os.Chdir("/Volumes/Data/Code/workspace/ttcn-report")
+	// 获取工作目录
+	exe, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	dir := filepath.Dir(exe)
+	base := filepath.Base(exe)
+	if strings.HasPrefix(exe, os.TempDir()) ||
+		strings.HasPrefix(base, "___") {
+		_, filename, _, ok := runtime.Caller(0)
+		if ok {
+			dir = filepath.Dir(filename)
+		}
+	}
+
+	// 设置工作目录
+	err = os.Chdir(dir)
 	if err != nil {
 		panic(err)
 	}
 }
 
 func main() {
-	src := open(file)
+	var f string
+	flag.StringVar(&f, "f", "", "日志文件路径")
+	flag.Parse()
+
+	if len(f) == 0 {
+		f = "MERGE-MTC.log" // 调试
+		// f = "ATS_Test_2026-01-15_09-47-26-MTC.log"
+	}
+
+	_ = os.Remove(output)
+
+	// 打开文件
+	src := open(f)
 	dst := excelize.NewFile()
 	defer func() {
 		_ = src.Close()
+
+		// 保存并关闭文件
+		_ = dst.SaveAs(output)
 		_ = dst.Close()
 	}()
 
@@ -48,7 +78,7 @@ func main() {
 		}
 		text = text[9:]
 
-		// 提取出 LOG_ID 用于确定模板 excel 内容
+		// 获取 LOG_ID 和 JSON 字符串
 		var (
 			i = 0
 			l = len(text)
@@ -66,39 +96,51 @@ func main() {
 		id := text[:i]
 		str := text[i+1 : l-1]
 		str = strings.Replace(str, `\`, "", -1) // 移除额外的转义字符
-
 		if len(str) == 0 {
 			continue
 		}
 
-		// 输出到文件
-		var err error
-		switch id {
-		case "TC_EVSE_DC_VTB_DIN_7_6_2_1":
-			val := &case7621{}
-			unmarshal([]byte(str), val)
-
-			err = render7621(id, val, dst) // 解析后输出到文件
-		case "TC_EVSE_DC_VTB_DIN_7_6_3_TP1":
-			val := &case7631{}
-			unmarshal([]byte(str), val)
-
-			err = render7631(id, val, dst) // 解析后输出到文件
-		}
-		if err != nil {
-			fmt.Printf("[error] %s generate failed: %s\n", id, err)
+		// 获取对应模板
+		tpl := caseTpl(id)
+		if tpl == "" {
 			continue
 		}
+		logs[tpl] = append(logs[tpl], str)
 	}
 	err := scanner.Err()
 	if err != nil {
 		panic(err)
 	}
 
-	// 保存文件
-	_ = os.Remove("output/report.xlsx")
-	err = dst.SaveAs("output/report.xlsx")
-	if err != nil {
-		panic(err)
+	// 遍历统计结果
+	// 生成 excel 文件
+	for k, log := range logs {
+		switch k {
+		case "7.5.1":
+			err = render751(log, dst)
+		case "7.5.2":
+			err = render752(log, dst)
+		case "7.6.2":
+			err = render762(log, dst)
+		case "7.6.3":
+			err = render763(log, dst)
+		case "7.6.4":
+			err = render764(log, dst)
+		case "7.6.5.1":
+			err = render7651(log, dst)
+		case "7.6.5.2":
+			err = render7652(log, dst)
+		case "7.6.5.3":
+			err = render7653(log, dst)
+		case "7.6.5.4":
+			err = render7654(log, dst)
+		case "7.6.7":
+			err = render767(log, dst)
+		case "7.6.9":
+			err = render769(log, dst)
+		}
+		if err != nil {
+			fmt.Printf("[error] render %s error: %s\n", k, err)
+		}
 	}
 }

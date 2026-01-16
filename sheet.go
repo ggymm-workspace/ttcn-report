@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -9,10 +10,26 @@ import (
 )
 
 func copySheet(src, dst *excelize.File, srcSheet, dstSheet string) error {
+	// 防止 sheet 名称重复
+	i := 1
+	for {
+		if !slices.Contains(dst.GetSheetList(), dstSheet+fmt.Sprintf("(%d)", i)) {
+			idx, err := dst.NewSheet(dstSheet)
+			if err != nil {
+				return err
+			}
+			dst.SetActiveSheet(idx)
+			break
+		}
+		i++
+	}
+
+	// 复制 sheet 到目标文件
 	dim, err := src.GetSheetDimension(srcSheet)
 	if err != nil {
 		return fmt.Errorf("get sheet dimension: %w", err)
 	}
+
 	if dim != "" {
 		startCell, endCell := dim, dim
 		if strings.Contains(dim, ":") {
@@ -20,13 +37,13 @@ func copySheet(src, dst *excelize.File, srcSheet, dstSheet string) error {
 			startCell = parts[0]
 			endCell = parts[1]
 		}
-		startCol, startRow, err := excelize.CellNameToCoordinates(startCell)
-		if err != nil {
-			return fmt.Errorf("parse start cell %s: %w", startCell, err)
+		startCol, startRow, err1 := excelize.CellNameToCoordinates(startCell)
+		if err1 != nil {
+			return fmt.Errorf("parse start cell %s: %w", startCell, err1)
 		}
-		endCol, endRow, err := excelize.CellNameToCoordinates(endCell)
-		if err != nil {
-			return fmt.Errorf("parse end cell %s: %w", endCell, err)
+		endCol, endRow, err1 := excelize.CellNameToCoordinates(endCell)
+		if err1 != nil {
+			return fmt.Errorf("parse end cell %s: %w", endCell, err1)
 		}
 
 		styleMap := make(map[int]int)
@@ -37,13 +54,13 @@ func copySheet(src, dst *excelize.File, srcSheet, dstSheet string) error {
 			if mapped, ok := styleMap[styleID]; ok {
 				return mapped, nil
 			}
-			style, err := src.GetStyle(styleID)
-			if err != nil {
-				return 0, err
+			style, err2 := src.GetStyle(styleID)
+			if err2 != nil {
+				return 0, err2
 			}
-			newID, err := dst.NewStyle(style)
-			if err != nil {
-				return 0, err
+			newID, err2 := dst.NewStyle(style)
+			if err2 != nil {
+				return 0, err2
 			}
 			styleMap[styleID] = newID
 			return newID, nil
@@ -51,23 +68,23 @@ func copySheet(src, dst *excelize.File, srcSheet, dstSheet string) error {
 
 		for row := startRow; row <= endRow; row++ {
 			for col := startCol; col <= endCol; col++ {
-				cell, err := excelize.CoordinatesToCellName(col, row)
-				if err != nil {
+				cell, err2 := excelize.CoordinatesToCellName(col, row)
+				if err2 != nil {
 					continue
 				}
 
-				if formula, err := src.GetCellFormula(srcSheet, cell); err == nil && formula != "" {
+				if formula, err3 := src.GetCellFormula(srcSheet, cell); err3 == nil && formula != "" {
 					_ = dst.SetCellFormula(dstSheet, cell, formula)
 				} else {
-					raw, err := src.GetCellValue(srcSheet, cell, excelize.Options{RawCellValue: true})
-					if err == nil && raw != "" {
+					raw, err4 := src.GetCellValue(srcSheet, cell, excelize.Options{RawCellValue: true})
+					if err4 == nil && raw != "" {
 						cellType, _ := src.GetCellType(srcSheet, cell)
 						switch cellType {
 						case excelize.CellTypeBool:
 							val := raw == "1" || strings.EqualFold(raw, "true")
 							_ = dst.SetCellValue(dstSheet, cell, val)
 						case excelize.CellTypeNumber, excelize.CellTypeDate:
-							if num, err := strconv.ParseFloat(raw, 64); err == nil {
+							if num, err5 := strconv.ParseFloat(raw, 64); err5 == nil {
 								_ = dst.SetCellValue(dstSheet, cell, num)
 							} else {
 								_ = dst.SetCellValue(dstSheet, cell, raw)
@@ -78,9 +95,9 @@ func copySheet(src, dst *excelize.File, srcSheet, dstSheet string) error {
 					}
 				}
 
-				styleID, err := src.GetCellStyle(srcSheet, cell)
-				if err == nil && styleID > 0 {
-					if newStyleID, err := resolveStyle(styleID); err == nil && newStyleID > 0 {
+				styleID, err2 := src.GetCellStyle(srcSheet, cell)
+				if err2 == nil && styleID > 0 {
+					if newStyleID, err3 := resolveStyle(styleID); err3 == nil && newStyleID > 0 {
 						_ = dst.SetCellStyle(dstSheet, cell, cell, newStyleID)
 					}
 				}

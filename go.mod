@@ -4,6 +4,7 @@ go 1.25.5
 
 require (
 	github.com/bytedance/sonic v1.14.2
+	github.com/ggymm/gopkg v1.2.7
 	github.com/xuri/excelize/v2 v2.10.0
 )
 

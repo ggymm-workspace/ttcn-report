@@ -7,8 +7,8 @@ import (
 func render7653(log []string, dst *excelize.File) error {
 	t := "7.5.6.3"
 
-	// 打开 tpl 文件
-	tpl, err := excelize.OpenFile(t + ".xlsx")
+	// 模板
+	tpl, err := openTpl(t + ".xlsx")
 	if err != nil {
 		return err
 	}

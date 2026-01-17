@@ -136,8 +136,34 @@ func main() {
 			err = render7654(log, dst)
 		case "7.6.7":
 			err = render767(log, dst)
+		case "7.6.8":
+			err = render768(log, dst) // TODO: 未完成
 		case "7.6.9":
 			err = render769(log, dst)
+		case "7.6.10":
+			err = render7610(log, dst)
+		case "7.6.11":
+			err = render7611(log, dst)
+		case "7.6.12":
+			err = render7612(log, dst)
+		case "7.6.13":
+			err = render7613(log, dst)
+		case "7.6.14":
+			err = render7614(log, dst)
+		case "7.6.15":
+			err = render7615(log, dst)
+		case "7.6.16":
+			err = render7616(log, dst) // TODO: 未完成
+		case "7.6.17":
+			err = render7617(log, dst)
+		case "7.6.18":
+			err = render7618(log, dst)
+		case "7.6.19":
+			err = render7619(log, dst)
+		case "7.6.20":
+			err = render7620(log, dst) // TODO: 未完成
+		case "7.6.21":
+			err = render7621(log, dst) // TODO: 未完成
 		}
 		if err != nil {
 			fmt.Printf("[error] render %s error: %s\n", k, err)

@@ -27,6 +27,7 @@ func render763(log []string, dst *excelize.File) error {
 		idx := conv.ParseInt(i) - 1
 		nums[idx] = -nums[idx] // 对应序号图表有值
 
+		// 解析
 		v := make(map[string]string)
 		unmarshal([]byte(s), &v)
 
@@ -47,7 +48,7 @@ func render763(log []string, dst *excelize.File) error {
 	}
 
 	// 精简 sheet 页面
-	start := 4
+	start := 4 // 有内容的作为第一行
 	for _, n := range nums {
 		if n > 0 {
 			// 存在，则增加行

@@ -29,6 +29,7 @@ func render762(log []string, dst *excelize.File) error {
 
 		switch id {
 		case "TC_EVSE_DC_VTB_DIN_7_6_2_1", "TC_EVSE_DC_VTB_DIN_7_6_2_2":
+			// 解析
 			v := make(map[string]string)
 			unmarshal([]byte(s), &v)
 
@@ -39,6 +40,7 @@ func render762(log []string, dst *excelize.File) error {
 			params[i+"_参数_4_图片"] = v["V_SCREEN_SHOT"]
 		case "TC_EVSE_DC_VTB_DIN_7_6_2_3", "TC_EVSE_DC_VTB_DIN_7_6_2_4",
 			"TC_EVSE_DC_VTB_DIN_7_6_2_5", "TC_EVSE_DC_VTB_DIN_7_6_2_6":
+			// 解析
 			v := make(map[string]string)
 			unmarshal([]byte(s), &v)
 
@@ -60,7 +62,7 @@ func render762(log []string, dst *excelize.File) error {
 	}
 
 	// 精简 sheet 页面
-	start := 4
+	start := 4 // 有内容的作为第一行
 	for _, n := range nums {
 		if n > 0 {
 			// 存在，则增加行

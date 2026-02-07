@@ -1,7 +1,7 @@
 .idea
 
 /docs
-/output
+/dist
 
 
 *-MTC.log

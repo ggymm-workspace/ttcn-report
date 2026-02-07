@@ -2,58 +2,16 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
-	"os"
-	"path/filepath"
-	"runtime"
 	"strings"
+	"testing"
 
 	"github.com/xuri/excelize/v2"
 )
 
-var (
-	logs  = map[string][]string{}
-	sheet = "Sheet1"
-	// output = "output/Report.xlsx"
-)
-
-func init() {
-	// 获取工作目录
-	exe, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	dir := filepath.Dir(exe)
-	base := filepath.Base(exe)
-	if strings.HasPrefix(exe, os.TempDir()) ||
-		strings.HasPrefix(base, "___") {
-		_, filename, _, ok := runtime.Caller(0)
-		if ok {
-			dir = filepath.Dir(filename)
-		}
-	}
-
-	// 设置工作目录
-	err = os.Chdir(dir)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func main() {
-	var in, out string
-	flag.StringVar(&in, "i", "", "日志文件路径")
-	flag.StringVar(&out, "o", "", "日志文件路径")
-	flag.Parse()
-
-	if len(in) == 0 {
-		os.Exit(-1)
-	}
-	if len(out) == 0 {
-		os.Exit(-1)
-	}
-	_ = os.Remove(out)
+func Test_Main(t *testing.T) {
+	in := "D:\\temp\\ATS_Test_2026-02-07_16-04-30-MTC.log"
+	out := "temp.xlsx"
 
 	// 打开文件
 	src := open(in)

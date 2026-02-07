@@ -1,7 +1,7 @@
 .PHONY: help clean package package-windows
 
 BINARY_NAME=ttcn-report
-OUTPUT_DIR=output
+OUTPUT_DIR=dist
 
 help:
 	@echo "可用命令:"

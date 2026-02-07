@@ -20,7 +20,7 @@ func render7619(log []string, dst *excelize.File) error {
 	for _, s := range log {
 		// 解析
 		v := make(map[string]string)
-		unmarshal([]byte(s), v)
+		unmarshal([]byte(s), &v)
 
 		// 赋值
 		params["参数_1"] = v["V_AT1_AFTER"]

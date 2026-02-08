@@ -27,6 +27,9 @@ func render751(log []string, dst *excelize.File) error {
 		params["参数_2"] = v["V_EV_MAX_VOLT_LIMIT"]
 		params["参数_3"] = v["V_IS_EVSE_STOP_NEXT_MSG"]
 		params["参数_4"] = v["V_BODY"]
+		if b, ok := body[v["V_BODY"]]; ok {
+			params["参数_4"] = b
+		}
 		params["参数_5"] = v["V_RCV_FAILED_WRONG_CHARGE_PARAMETER"]
 		params["参数_6"] = v["V_T_8"]
 		params["参数_7"] = v["V_LIMIT"]

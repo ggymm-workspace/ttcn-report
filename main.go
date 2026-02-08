@@ -13,9 +13,9 @@ import (
 )
 
 var (
+	body  = map[string]string{}
 	logs  = map[string][]string{}
 	sheet = "Sheet1"
-	// output = "output/Report.xlsx"
 )
 
 func init() {
@@ -75,39 +75,63 @@ func main() {
 		}
 
 		text = text[16:]
-		if len(text) <= 9 || text[:9] != `"[LOG_ID:` {
+		if len(text) <= 9 {
 			continue
 		}
-		text = text[9:]
+		if strings.HasPrefix(text, `"[LOG_ID:`) {
+			text = text[9:]
 
-		// 获取 LOG_ID 和 JSON 字符串
-		var (
-			i = 0
-			l = len(text)
-		)
-		for i < l {
-			if text[i] == ']' {
-				break
+			// 获取 LOG_ID 和 JSON 字符串
+			var (
+				i = 0
+				l = len(text)
+			)
+			for i < l {
+				if text[i] == ']' {
+					break
+				}
+				i++
 			}
-			i++
-		}
-		if i == -1 || text[l-1:] != `"` {
-			continue
-		}
+			if i == 0 || text[l-1:] != `"` {
+				continue
+			}
 
-		id := text[:i]
-		str := text[i+1 : l-1]
-		str = strings.Replace(str, `\`, "", -1) // 移除额外的转义字符
-		if len(str) == 0 {
-			continue
-		}
+			// 获取对应模板
+			id := text[:i]
+			tpl := caseTpl(id)
 
-		// 获取对应模板
-		tpl := caseTpl(id)
-		if tpl == "" {
-			continue
+			// 获取日志内容
+			str := text[i+1 : l-1]
+			str = strings.Replace(str, `\`, "", -1) // 移除额外的转义字符
+
+			if len(str) == 0 || len(tpl) == 0 {
+				continue
+			}
+			logs[tpl] = append(logs[tpl], str)
+		} else if strings.HasPrefix(text, `"[BODY_ID:`) {
+			// 获取 BODY_ID 和 内容 字符串
+			var (
+				i = 0
+				l = len(text)
+			)
+			for i < l {
+				if text[i] == '"' {
+					break
+				}
+				i++
+			}
+
+			// 获取 ID
+			id := text[:i]
+
+			// 获取 内容
+			str := text[i+1:]
+
+			if len(id) == 0 || len(str) == 0 {
+				continue
+			}
+			body[id] = str
 		}
-		logs[tpl] = append(logs[tpl], str)
 	}
 	err := scanner.Err()
 	if err != nil {

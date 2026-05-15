@@ -18,6 +18,23 @@ func caseId(str string) string {
 	return id
 }
 
+func caseData(str string) []map[string]any {
+	root, err := sonic.Get([]byte(str))
+	if err != nil {
+		panic(err)
+	}
+	data, err := root.Get("DATA").Array()
+	if err != nil {
+		panic(err)
+	}
+
+	dataMap := make([]map[string]any, 0, len(data))
+	for _, d := range data {
+		dataMap = append(dataMap, d.(map[string]any))
+	}
+	return dataMap
+}
+
 func caseTpl(str string) string {
 	if strings.Contains(str, "7_5_1") {
 		return "7.5.1"

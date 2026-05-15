@@ -83,9 +83,9 @@ func copySheet(src, dst *excelize.File, srcSheet, dstSheet string) error {
 						case excelize.CellTypeBool:
 							val := raw == "1" || strings.EqualFold(raw, "true")
 							_ = dst.SetCellValue(dstSheet, cell, val)
-						case excelize.CellTypeNumber, excelize.CellTypeDate:
+						case excelize.CellTypeNumber, excelize.CellTypeUnset:
 							if num, err5 := strconv.ParseFloat(raw, 64); err5 == nil {
-								_ = dst.SetCellValue(dstSheet, cell, num)
+								_ = dst.SetCellFloat(dstSheet, cell, num, 2, 64)
 							} else {
 								_ = dst.SetCellValue(dstSheet, cell, raw)
 							}

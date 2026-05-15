@@ -1,8 +1,6 @@
 package main
 
-import (
-	"github.com/xuri/excelize/v2"
-)
+import "github.com/xuri/excelize/v2"
 
 func render769(log []string, dst *excelize.File) error {
 	t := "7.6.9"
@@ -38,8 +36,7 @@ func render769(log []string, dst *excelize.File) error {
 	}
 
 	for _, s := range log {
-		v := make([]map[string]string, 0, 441)
-		unmarshal([]byte(s), &v)
+		v := caseData(s)
 
 		// 赋值
 		row := 7
@@ -52,7 +49,7 @@ func render769(log []string, dst *excelize.File) error {
 				cell, _ := excelize.CoordinatesToCellName(col, row)
 
 				// 设置 cell 的值
-				_ = tpl.SetCellValue(sheet, cell, v[i][key])
+				_ = tpl.SetCellFloat(sheet, cell, formatFloat(v[i][key]), 2, 64)
 
 				col++
 			}

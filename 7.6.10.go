@@ -37,8 +37,7 @@ func render7610(log []string, dst *excelize.File) error {
 	cols := []int{3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}
 
 	for _, s := range log {
-		v := make([]map[string]string, 0, 42)
-		unmarshal([]byte(s), &v)
+		v := caseData(s)
 
 		// 赋值
 		row := 9
@@ -50,7 +49,7 @@ func render7610(log []string, dst *excelize.File) error {
 				cell, _ := excelize.CoordinatesToCellName(cols[j], row)
 
 				// 设置 cell 的值
-				_ = tpl.SetCellValue(sheet, cell, v[i][key])
+				_ = tpl.SetCellFloat(sheet, cell, formatFloat(v[i][key]), 2, 64)
 			}
 			row++
 		}

@@ -68,6 +68,10 @@ func main() {
 
 	// 按行解析
 	scanner := bufio.NewScanner(src)
+
+	// 设置缓冲区
+	buf := make([]byte, 0, 64*1024)
+	scanner.Buffer(buf, 10*1024*1024)
 	for scanner.Scan() {
 		text := scanner.Text()
 		if len(text) <= 16 {
@@ -111,7 +115,7 @@ func main() {
 		} else if strings.HasPrefix(text, `"[BODY_ID:`) {
 			// 获取 BODY_ID 和 内容 字符串
 			var (
-				i = 0
+				i = 1
 				l = len(text)
 			)
 			for i < l {
@@ -122,7 +126,7 @@ func main() {
 			}
 
 			// 获取 ID
-			id := text[:i]
+			id := text[1:i]
 
 			// 获取 内容
 			str := text[i+1:]

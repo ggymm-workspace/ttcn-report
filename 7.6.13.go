@@ -107,6 +107,11 @@ func render7613(log []string, dst *excelize.File) error {
 		params[i+"_参数_4"] = v["V_TIME2_MS"]
 		params[i+"_参数_5"] = v["V_UCC"]
 		params[i+"_参数_6_图片"] = v["V_SCREEN_SHOT"]
+		params[i+"_参数_7"] = v["V_BODY1"]
+
+		if b, ok := body[v["V_BODY1"]]; ok {
+			params[i+"_参数_7"] = b
+		}
 	}
 
 	// 设置 cell 的值

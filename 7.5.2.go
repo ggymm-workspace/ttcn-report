@@ -39,6 +39,25 @@ func render752(log []string, dst *excelize.File) error {
 		params["参数_14"] = v["V_AFTER_PRECHARGE_PHASE_BODY"]
 		params["参数_15"] = v["V_ENERGY_TRANSFER_PHASE_BODY"]
 		params["参数_16_图片"] = v["V_SCREEN_SHOT4"]
+
+		if b, ok := body[v["V_PREPARATION_PHASE_BODY"]]; ok {
+			params["参数_4"] = b
+		}
+		if b, ok := body[v["V_BDC_CABLE_CHECK_PHASE_BODY"]]; ok {
+			params["参数_7"] = b
+		}
+		if b, ok := body[v["V_AC_CABLE_CHECK_PHASE_BODY"]]; ok {
+			params["参数_8"] = b
+		}
+		if b, ok := body[v["V_PRECHARGE_PHASE_BODY"]]; ok {
+			params["参数_13"] = b
+		}
+		if b, ok := body[v["V_AFTER_PRECHARGE_PHASE_BODY"]]; ok {
+			params["参数_14"] = b
+		}
+		if b, ok := body[v["V_ENERGY_TRANSFER_PHASE_BODY"]]; ok {
+			params["参数_15"] = b
+		}
 	}
 
 	// 设置 cell 的值
